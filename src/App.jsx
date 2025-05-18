@@ -8,7 +8,6 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 
 import LoginPage from "./pages/Login";
-import Register from "./pages/Register";
 import ChangePasswordForm from "./pages/change-password";
 import Protected from "./components/route-hocs/Protected";
 import ListDashBoard from "./pages/Entry";
@@ -23,7 +22,6 @@ function App() {
           <Route path="change-password" element={<ChangePasswordForm />} />
         </Route>
         <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

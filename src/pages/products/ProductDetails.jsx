@@ -1,8 +1,8 @@
 import { Descriptions } from "antd";
 import PropTypes from "prop-types";
 
-const AssetDetails = ({ asset }) => {
-  console.log("Asset Details", asset);
+const ProductDetails = ({ asset }) => {
+  console.log("Product Details", asset);
   const productInfo = [
     {
       key: "1",
@@ -126,8 +126,8 @@ const AssetDetails = ({ asset }) => {
   );
 };
 
-AssetDetails.propTypes = {
+ProductDetails.propTypes = {
   asset: PropTypes.object,
 };
 
-export default AssetDetails;
+export default ProductDetails;

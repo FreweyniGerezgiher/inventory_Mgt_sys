@@ -1,12 +1,11 @@
 import { useSelector } from "react-redux";
-import { Outlet, useLocation } from "react-router-dom";
-
+import { Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 export default function Protected() {
   const auth = useSelector((state) => state.auth);
-  const location = useLocation();
 
   if (!auth.signedIn) {
-      // return <Navigate to="/login" replace />;
+      return <Navigate to="/login" replace />;
   }
 
   return (

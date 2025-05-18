@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { URL } from "../config/config";
-import { http } from "../services/http/http";
+import { URL } from "../../config/config";
+import { http } from "../../services/http/http";
 import { Dropdown, Space, ConfigProvider } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import DataTable from "../components/tables/DataTable";
-import FormModal from "../components/modals/FormModal";
-import AddGroup from "./AddGroup";
-import ConfirmModal from "../components/modals/ConfirmModal";
-import DetailsDrawer from "../components/drawer/DetailsDrawer";
-import GroupDetails from "./GroupDetails";
+import DataTable from "../../components/tables/DataTable";
+import FormModal from "../../components/modals/FormModal";
+import AddLocation from "./AddLocation";
+import ConfirmModal from "../../components/modals/ConfirmModal";
+import DetailsDrawer from "../../components/drawer/DetailsDrawer";
 import { toast } from "react-toastify";
 
 const items = [
@@ -204,16 +203,8 @@ export default function LocationTable() {
         title="Add Location"
         onSubmitForm={handleSubmitLocationEvent}
       >
-        <AddGroup onSuccess={handleOnClose} submitBtnRef={submitBtnRef} />
+        <AddLocation onSuccess={handleOnClose} submitBtnRef={submitBtnRef} />
       </FormModal>
-
-      <DetailsDrawer
-        open={openDetails}
-        onCloseDrawer={handleOnClose}
-        title="Location Details"
-      >
-        <GroupDetails location={selectedLocation} />
-      </DetailsDrawer>
 
       <ConfirmModal
         onDeleteItem={handleDeleteItem}

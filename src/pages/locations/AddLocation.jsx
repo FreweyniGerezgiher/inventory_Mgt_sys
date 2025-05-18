@@ -1,11 +1,11 @@
-import { http } from "../services/http/http";
-import { URL } from "../config/config";
+import { http } from "../../services/http/http";
+import { URL } from "../../config/config";
 
-import Label from "../components/controlled/Label";
-import BaseInput from "../components/controlled/BaseInput";
+import Label from "../../components/controlled/Label";
+import BaseInput from "../../components/controlled/BaseInput";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-export default function CreateNewGroup({ submitBtnRef, onSuccess }) {
+export default function CreateNewLocation({ submitBtnRef, onSuccess }) {
   const {
     register,
     handleSubmit,
@@ -15,14 +15,14 @@ export default function CreateNewGroup({ submitBtnRef, onSuccess }) {
   async function onCompleteClick(values) {
     const response = await http.request({
       method: "post",
-      url: `${URL + "/group/write"}`,
+      url: `${URL + "/locations/add"}`,
       data: values,
     });
     if (!response.isError) {
-      toast.success("Group created successfully");
+      toast.success("Location created successfully");
       onSuccess();
     } else {
-      toast.error("Failed to create group");
+      toast.error("Failed to create location");
     }
   }
 
@@ -38,15 +38,26 @@ export default function CreateNewGroup({ submitBtnRef, onSuccess }) {
           <span className="flex flex-col w-full">
             <BaseInput
               type="text"
-              placeholder="group name"
+              placeholder="location name"
               className="outline-none focus-within:border-2 pl-2 border border-gray-300 rounded py-2 w-full text-sm"
-              {...register("group_name", { required: true })}
+              {...register("name", { required: true })}
             />
-            {errors.group_name && (
+            {errors.name && (
               <span className="text-red-400 text-xs mt-2">
-                group name is required
+                Name is required
               </span>
             )}
+          </span>
+        </div>
+        <div className="flex flex-col sm:flex-row   my-1 items-start sm:space-x-4 w-full">
+          <Label className="mt-2" name="Address" />
+          <span className="flex flex-col w-full">
+            <BaseInput
+              type="text"
+              placeholder="location address"
+              className="outline-none focus-within:border-2 pl-2 border border-gray-300 rounded py-2 w-full text-sm"
+              {...register("address")}
+            />
           </span>
         </div>
       </div>

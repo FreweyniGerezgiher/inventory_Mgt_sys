@@ -1,8 +1,8 @@
 import { Descriptions } from "antd";
 import PropTypes from "prop-types";
-import formatDate from "../utils/formatdate";
+import formatDate from "../../utils/formatdate";
 
-const DriverDetails = ({ driver }) => {
+const UserDetails = ({ driver }) => {
   const driverInfos = [
     {
       key: "1",
@@ -92,7 +92,7 @@ const DriverDetails = ({ driver }) => {
   return (
     <>
       <Descriptions
-        title="Driver Information"
+        title="User Information"
         size="default"
         items={driverInfos}
       />
@@ -111,8 +111,8 @@ const DriverDetails = ({ driver }) => {
   );
 };
 
-DriverDetails.propTypes = {
+UserDetails.propTypes = {
   driver: PropTypes.object,
 };
 
-export default DriverDetails;
+export default UserDetails;

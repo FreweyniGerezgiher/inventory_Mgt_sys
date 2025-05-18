@@ -12,7 +12,6 @@ import { store } from "./store/store";
 import { Provider } from "react-redux";
 import httpInit from "./services/http/httpInit";
 
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

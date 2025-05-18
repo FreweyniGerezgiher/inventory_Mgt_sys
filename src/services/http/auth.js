@@ -5,13 +5,12 @@ const auth = {
   async signIn(payload) {
     try {
       const response = await http.request(payload);
-      if (response.access_token) {
-        tokenService.saveToken(response.access_token);
+      if (response.data.accessToken) {
+        tokenService.saveToken(response.data.accessToken);
         apiService.setHeader();
-        // console.log("token", response.access_token);
         return {
           isError: false,
-          token: response.access_token,
+          token: response.data.accessToken,
         };
       }
     } catch (err) {

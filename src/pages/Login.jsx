@@ -1,64 +1,41 @@
 import {  useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
+import { setUser, setStatus } from "../store/slices/authSlice";
+import auth from "../services/http/auth";
+import { URL } from "../config/config";
 
 function Login() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: fError },
+  } = useForm();
 
-
-  const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const authCheck = () => {
-    setTimeout(() => {
-      fetch("http://localhost:4000/api/login")
-        .then((response) => response.json())
-        .then((data) => {
-          alert("Successfully Login");
-          localStorage.setItem("user", JSON.stringify(data));
-          authContext.signin(data._id, () => {
-            navigate("/");
-          });
-        })
-        .catch((err) => {
-          alert("Wrong credentials, Try again")
-          console.log(err);
-        });
-    }, 3000);
-  };
-
-  const loginUser = (e) => {
-    // Cannot send empty data
-    if (form.email === "" || form.password === "") {
-      alert("To login user, enter details to proceed...");
+  const handleLogin = async ({ email, password }) => {
+    setLoading(true);
+    const requestPayload = {
+      method: "post",
+      url: `${URL + "/users/login"}`,
+      data: { email: email, password },
+    };
+    const response = await auth.signIn(requestPayload);
+    if (response && !response.isError) {
+      dispatch(setStatus({ signedIn: true }));
+      dispatch(setUser({ user: email }));
+      navigate("/");
     } else {
-      fetch("http://localhost:4000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(form),
-      })
-        .then((result) => {
-          console.log("User login", result);
-        })
-        .catch((error) => {
-          console.log("Something went wrong ", error);
-        });
+      setError("Incorrect email or password");
+      setLoading(false);
     }
-    authCheck();
+    setLoading(false);
   };
-
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   
   return (
     <>
@@ -73,20 +50,8 @@ function Login() {
               src="src/assets/logo.png"
               alt="Your Company"
             />
-            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-              Signin to your account
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Or
-              <span
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                start your 14-day free trial
-              </span>
-            </p>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {/* <input type="hidden" name="remember" defaultValue="true" /> */}
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleLogin)}>
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
                 <label htmlFor="email-address" className="sr-only">
@@ -100,8 +65,7 @@ function Login() {
                   required
                   className="relative block w-full rounded-t-md border-0 py-1.5 px-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="Email address"
-                  value={form.email}
-                  onChange={handleInputChange}
+                  {...register("email", { required: true })}
                 />
               </div>
               <div>
@@ -116,8 +80,7 @@ function Login() {
                   required
                   className="relative block w-full rounded-b-md border-0 py-1.5 px-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="Password"
-                  value={form.password}
-                  onChange={handleInputChange}
+                  {...register("password", { required: true })}
                 />
               </div>
             </div>
@@ -151,25 +114,18 @@ function Login() {
               <button
                 type="submit"
                 className="group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold  hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                onClick={loginUser}
               >
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  {/* <LockClosedIcon
-                    className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-                    aria-hidden="true"
-                  /> */}
                 </span>
+                {loading && (
+              <i
+                className="fa fa-circle-o-notch animate-spin"
+                style={{ fontSize: 14 }}
+              />
+            )}
                 Sign in
               </button>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                Or{" "}
-                <span
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Don't Have an Account, Please{" "}
-                  <Link to="/register"> Register now </Link>
-                </span>
-              </p>
+             
             </div>
           </form>
         </div>

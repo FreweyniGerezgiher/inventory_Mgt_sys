@@ -1,7 +1,7 @@
-import AssetTable from "./AssetList";
-import DriverTable from "./DriverList";
-import AssetsDashboard from "./AssetsDashboard";
-import LocationTable from "./GroupList";
+import ProductTable from "./products/ProductList";
+import UserTable from "./users/UserList";
+import Dashboard from "./Dashboard";
+import LocationTable from "./locations/LocationList";
 import { Tab } from "@headlessui/react";
 import { ArrowsPointingOutIcon, UsersIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline'
 import Header from "../components/layouts/HeaderNav"
@@ -112,16 +112,22 @@ export default function ListDashBoard() {
               <Header/>
               <Tab.Panels className="border-gray-800">
                 <Tab.Panel>
-                  <AssetsDashboard />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <AssetTable />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <DriverTable />
+                  <Dashboard />
                 </Tab.Panel>
                 <Tab.Panel>
                   <LocationTable />
+                </Tab.Panel>
+                <Tab.Panel>
+                  <ProductTable />
+                </Tab.Panel>
+                <Tab.Panel>
+                  <ProductTable />
+                </Tab.Panel>
+                <Tab.Panel>
+                  <ProductTable />
+                </Tab.Panel>
+                <Tab.Panel>
+                  <UserTable />
                 </Tab.Panel>
               </Tab.Panels>
             </div>
