@@ -2,7 +2,7 @@ import { Space } from "antd";
 import Label from "../../components/controlled/Label";
 import BaseInput from "../../components/controlled/BaseInput";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
 import { toast } from "react-toastify";
@@ -10,6 +10,20 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AddProductForm = ({ submitBtnRef, onSuccess }) => {
   const [loading, setLoading] = useState(false);
+
+    const [categories, setCategories] = useState([]);
+    const [category, setCategory] = useState({ id: "", name: "" });
+
+
+  const getCategories = async () => {
+    const response = await http.request({
+      url: `${URL + "/product_category/all"}`,
+    });
+
+    if (!response.isError) {
+      setCategories(response.data);
+    }
+  };
 
   const {
     register,
@@ -25,12 +39,12 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
         url: `${URL}/products/add`,
         data: {
           name: data.name,
-          category_id: parseInt(data.category_id),
+          category_id: parseInt(category.id),
           sku: data.sku,
-          cost_price: parseFloat(data.cost_price),
           selling_price: parseFloat(data.selling_price),
         },
       };
+      console.log(requestPayload.data);
 
       const response = await http.request(requestPayload);
       if (!response.isError) {
@@ -44,6 +58,10 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
 
   return (
     <div className="">
@@ -62,17 +80,22 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
           </div>
 
           <div className="flex flex-col mb-3 sm:mb-1">
-            <Label required={true} className="mt-4" name="Category ID" />
-            <BaseInput
-              type="number"
-              placeholder="Category ID"
-              className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
-              {...register("category_id", { required: true })}
-            />
-            {errors.category_id && (
-              <span className="text-red-400 mt-2 text-xs">Category ID is required</span>
-            )}
-          </div>
+          <Label required={true} className="mt-2" name="Category" />
+          <span className="flex flex-col w-full">
+            <select
+              className="w-full outline-none focus-within:border-2 pl-3 border text-sm border-gray-300 bg-white rounded py-2 pr-5"
+              value={category.id}
+              onChange={(e) => setCategory({ id: e.target.value })}
+            >
+              <option value="">Select category</option>
+              {categories.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </span>
+        </div>
 
           <div className="flex flex-col mb-3 sm:mb-1">
             <Label required={true} className="mt-4" name="SKU" />
@@ -83,20 +106,6 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
             />
             {errors.sku && (
               <span className="text-red-400 mt-2 text-xs">SKU is required</span>
-            )}
-          </div>
-
-          <div className="flex flex-col mb-3 sm:mb-1">
-            <Label required={true} className="mt-4" name="Cost Price" />
-            <BaseInput
-              type="number"
-              step="0.01"
-              placeholder="Cost Price"
-              className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
-              {...register("cost_price", { required: true })}
-            />
-            {errors.cost_price && (
-              <span className="text-red-400 mt-2 text-xs">Cost price is required</span>
             )}
           </div>
 

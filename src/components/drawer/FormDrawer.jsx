@@ -21,14 +21,6 @@ const FormDrawer = ({
           paddingBottom: 50,
         },
       }}
-      // extra={
-      //   <Space>
-      //     <Button onClick={onCloseDrawer}>Cancel</Button>
-      //     <Button onClick={onCloseDrawer} type="primary">
-      //       Submit
-      //     </Button>
-      //   </Space>
-      // }
     >
       <Row gutter={16}>
         <Col span={24}>{children}</Col>
@@ -43,7 +35,7 @@ const FormDrawer = ({
               Cancel
             </Button>
             <Button
-              className="bg-green-600  hover:bg-green-500 hover: transition-colors duration-300"
+              className="bg-blue-600 rounded-md font-medium text-md ml-4 py-0.5" 
               onClick={onSubmitForm}
             >
               {isUpdate ? "Update" : "Submit"}

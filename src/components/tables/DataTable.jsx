@@ -6,7 +6,6 @@ const DataTable = ({
   columns,
   tableProps,
   loading = false,
-  paginateLimit = 10,
 }) => {
   return (
     <ConfigProvider
@@ -51,11 +50,11 @@ const DataTable = ({
     >
       <Table
         {...tableProps}
-        pagination={{ pageSize: paginateLimit }}
         className="overflow-x-auto text-sm"
         columns={columns}
         loading={loading}
         dataSource={data}
+        pagination={false}
         key={"key"}
       />
     </ConfigProvider>
@@ -67,7 +66,6 @@ DataTable.propTypes = {
   columns: PropTypes.array,
   tableProps: PropTypes.object,
   loading: PropTypes.bool,
-  paginateLimit: PropTypes.number,
 };
 
 export default DataTable;

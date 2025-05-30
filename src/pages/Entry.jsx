@@ -2,6 +2,10 @@ import ProductTable from "./products/ProductList";
 import UserTable from "./users/UserList";
 import Dashboard from "./Dashboard";
 import LocationTable from "./locations/LocationList";
+import CategoryTable from "./product-categories/CategoryList"
+import PurchaseTable from "./purchases/PurchaseList"
+import SupplierTable from "./suppliers/SupplierList";
+import SalesTable from "./sales/SalesList"
 import { Tab } from "@headlessui/react";
 import { ArrowsPointingOutIcon, UsersIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline'
 import Header from "../components/layouts/HeaderNav"
@@ -30,6 +34,70 @@ export default function ListDashBoard() {
                     <p className="text-xs md:text-base">Dashboard</p>
                   </div>
                 </Tab>
+
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
+                      selected
+                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
+                        : "border-l-0"
+                    )
+                  }
+                >
+                  <div className="flex gap-3">
+                    <ArrowsPointingOutIcon className="w-5 h-5 font-bold" />
+                    <p className="text-xs md:text-base">Sales</p>
+                  </div>
+                </Tab>
+
+                  <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
+                      selected
+                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
+                        : "border-l-0"
+                    )
+                  }
+                >
+                  <div className="flex gap-3">
+                    <ArrowsPointingOutIcon className="w-5 h-5 font-bold" />
+                    <p className="text-xs md:text-base">Orders</p>
+                  </div>
+                </Tab>                
+                  <hr className="border-gray-700 mx-2" />
+
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
+                      selected
+                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
+                        : "border-l-0"
+                    )
+                  }
+                >
+                  <div className="flex gap-3">
+                    <UsersIcon className="w-5 h-5 font-bold" />
+                    <p className="text-xs md:text-base">Users</p>
+                  </div>
+                </Tab>
+                  <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
+                      selected
+                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
+                        : "border-l-0"
+                    )
+                  }
+                >
+                  <div className="flex gap-3">
+                    <UsersIcon className="w-5 h-5 font-bold" />
+                    <p className="text-xs md:text-base">Suppliers</p>
+                  </div>
+                </Tab>
                 <Tab
                   className={({ selected }) =>
                     classNames(
@@ -45,7 +113,9 @@ export default function ListDashBoard() {
                     <p className="text-xs md:text-base">Locations</p>
                   </div>
                 </Tab>
-                
+
+                  <hr className="border-gray-700 mx-2" />
+
                 <Tab
                   className={({ selected }) =>
                     classNames(
@@ -73,37 +143,7 @@ export default function ListDashBoard() {
                 >
                   <div className="flex gap-3">
                     <ArrowsPointingOutIcon className="w-5 h-5 font-bold" />
-                    <p className="text-xs md:text-base">Sales</p>
-                  </div>
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
-                      selected
-                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
-                        : "border-l-0"
-                    )
-                  }
-                >
-                  <div className="flex gap-3">
-                    <ArrowsPointingOutIcon className="w-5 h-5 font-bold" />
-                    <p className="text-xs md:text-base">Orders</p>
-                  </div>
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
-                      selected
-                        ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
-                        : "border-l-0"
-                    )
-                  }
-                >
-                  <div className="flex gap-3">
-                    <UsersIcon className="w-5 h-5 font-bold" />
-                    <p className="text-xs md:text-base">Users</p>
+                    <p className="text-xs md:text-base">Product Categories</p>
                   </div>
                 </Tab>
             </Tab.List>
@@ -114,20 +154,26 @@ export default function ListDashBoard() {
                 <Tab.Panel>
                   <Dashboard />
                 </Tab.Panel>
+               <Tab.Panel>
+                  <SalesTable />
+                </Tab.Panel>
                 <Tab.Panel>
+                  <PurchaseTable />
+                </Tab.Panel>
+                 <Tab.Panel>
+                  <UserTable />
+                </Tab.Panel>
+                 <Tab.Panel>
+                  <SupplierTable />
+                </Tab.Panel>
+                 <Tab.Panel>
                   <LocationTable />
                 </Tab.Panel>
                 <Tab.Panel>
                   <ProductTable />
                 </Tab.Panel>
-                <Tab.Panel>
-                  <ProductTable />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <ProductTable />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <UserTable />
+                 <Tab.Panel>
+                  <CategoryTable />
                 </Tab.Panel>
               </Tab.Panels>
             </div>
