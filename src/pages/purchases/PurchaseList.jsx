@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, MagnifyingGlassIcon  } from "@heroicons/react/24/outline";
 import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
-import { Dropdown, Space, ConfigProvider, Table, Tag, Typography } from "antd";
+import { Dropdown, Space, ConfigProvider, Table, Input, Typography } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormDrawer from "../../components/drawer/FormDrawer";
 import AddPurchaseForm from "./AddPurchaseForm";
@@ -10,6 +10,7 @@ import EditPurchaseForm from "./EditPurchaseForm";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 
 const { Text } = Typography;
 
@@ -20,6 +21,7 @@ export default function PurchaseTable() {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const submitBtnRef = useRef(null);
   const confirmBtnRef = useRef(null);
@@ -40,10 +42,15 @@ export default function PurchaseTable() {
       render: (text, record) => text || record.supplier_name || '',
     },
     {
+      title: "Ref Number",
+      dataIndex: "reference_number",
+      key: "reference_number",
+    },
+    {
       title: "Total Amount",
       dataIndex: "total_amount",
       key: "total_amount",
-      render: (amount) => `${parseFloat(amount).toFixed(2)} ETB`,
+      render: (amount) => `${parseFloat(amount).toFixed(2)} ETB `,
       sorter: (a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount),
     },
     {
@@ -58,6 +65,7 @@ export default function PurchaseTable() {
       dataIndex: ["location", "name"],
       key: "location",
     },
+  
     {
       title: "Items",
       key: "items_count",
@@ -130,13 +138,13 @@ export default function PurchaseTable() {
         title: "Unit Cost",
         dataIndex: "unit_price",
         key: "unit_price",
-        render: (price) => `${parseFloat(price).toFixed(2)} ETB`,
+        render: (price) => `${parseFloat(price).toFixed(2)} ETB `,
       },
       {
         title: "Total",
         dataIndex: "total_price",
         key: "total_price",
-        render: (price) => `${parseFloat(price).toFixed(2)} ETB`,
+        render: (price) => `${parseFloat(price).toFixed(2)} ETB `,
       },
     ];
 
@@ -152,12 +160,15 @@ export default function PurchaseTable() {
   };
 
   // Fetch purchases data
-  const fetchPurchases = async () => {
+  const fetchPurchases = async (keyword = "") => {
     try {
       setLoading(true);
       const response = await http.request({
         method: "get",
         url: `${URL}/purchases/all`,
+         params: {
+          search: keyword
+        }
       });
 
       if (!response.isError) {
@@ -196,6 +207,18 @@ export default function PurchaseTable() {
   const handleSubmitPurchase = () => {
     submitBtnRef.current?.click();
   };
+
+     // Debounced search function
+    const debouncedSearch = debounce((value) => {
+      fetchPurchases(value);
+    }, 500);
+  
+    // Handle search input change
+    const handleSearch = (e) => {
+      const value = e.target.value;
+      setSearchTerm(value);
+      debouncedSearch(value);
+    };
 
   // Handle delete confirmation
   const handleDeleteItem = async () => {
@@ -237,11 +260,27 @@ export default function PurchaseTable() {
       <div className="flex flex-col">
         <div className="overflow-x-auto sm:-mx">
           <div className="inline-block min-w-full px-1.5 py-2 align-middle mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">Purchases</h1>
+            <div className="mb-4 w-1/2">
+              <Input
+                placeholder="Search by reference, supplier ..."
+                prefix={<MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />}
+                onChange={handleSearch}
+                value={searchTerm}
+                allowClear
+              />
+            </div>
+            </div>
             <div className="overflow-hidden md:rounded-lg">
               <Table
                 columns={columns}
                 dataSource={purchases}
                 loading={loading}
+                pagination={{ pageSize: 10 }}
+                bordered={true}
+                size="middle"  
+
                 expandable={{
                   expandedRowRender,
                   rowExpandable: (record) => record.items?.length > 0,

@@ -9,7 +9,7 @@ export default function Protected() {
   }
 
   return (
-    <div className="overflow-y-auto text-zinc-50 w-full h-screen">
+    <div className=" text-zinc-50 w-full max-h-full">
         <Outlet />
     </div>
   );

@@ -144,13 +144,13 @@ const EditSalesForm = ({ submitBtnRef, onSuccess, saleData }) => {
       title: 'Unit Price',
       dataIndex: 'unit_price',
       key: 'unit_price',
-      render: (price) => `₦${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Total',
       dataIndex: 'total_price',
       key: 'total_price',
-      render: (price) => `₦${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Action',
@@ -288,7 +288,7 @@ const EditSalesForm = ({ submitBtnRef, onSuccess, saleData }) => {
                   rowKey={(record, index) => index}
                 />
                 <div className="mt-4 text-right font-bold">
-                  Total: ₦{items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
+                  Total: ETB {items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
                 </div>
               </>
             )}

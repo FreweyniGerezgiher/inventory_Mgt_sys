@@ -7,6 +7,7 @@ const auth = {
       const response = await http.request(payload);
       if (response.data.accessToken) {
         tokenService.saveToken(response.data.accessToken);
+        userService.saveUser(response.data.user);
         apiService.setHeader();
         return {
           isError: false,

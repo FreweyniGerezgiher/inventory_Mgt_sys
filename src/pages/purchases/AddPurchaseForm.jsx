@@ -15,6 +15,7 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState(0);
+  const [reference_number, setReferenceNumber] = useState('');
 
   const {
     register,
@@ -93,6 +94,7 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
           supplier_id: data.supplier_id ? parseInt(data.supplier_id) : null,
           total_amount: items.reduce((sum, item) => sum + parseFloat(item.total_price), 0),
           location_id: parseInt(data.location_id),
+          reference_number: reference_number,
           items: items.map(item => ({
             product_id: item.product_id,
             quantity: item.quantity,
@@ -132,13 +134,13 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
       title: 'Unit Price',
       dataIndex: 'unit_price',
       key: 'unit_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Total',
       dataIndex: 'total_price',
       key: 'total_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Action',
@@ -208,8 +210,16 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
                 <span className="text-red-400 mt-2 text-xs">Location is required</span>
               )}
             </div>
-          </div>
 
+            <div className="w-full">
+              <Label name="Reference Number" />
+              <Input
+                type="text"
+                value={reference_number}
+                onChange={(e) => setReferenceNumber(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="mt-4">
             <h3 className="font-medium mb-2">Add Items</h3>
             <div className="flex gap-4 mb-4">
@@ -279,7 +289,7 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
                   rowKey={(record, index) => index}
                 />
                 <div className="mt-4 text-right font-bold">
-                  Total: ${items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
+                  Total: ETB {items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
                 </div>
               </>
             )}

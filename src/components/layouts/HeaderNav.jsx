@@ -7,11 +7,11 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const navigate = useNavigate();
-  let email = userService.getUser();
+  let user = userService.getUser();
 
   const items = [
     {
-      label: <h3 className="text-md font-semibold">{email}</h3>,
+      label: <h3 className="text-md font-semibold">{user.first_name + " " + user.last_name}</h3>,
       key: "1",
       icon: (
         <UserOutlined className="text-blue-400" style={{ fontSize: "110%" }} />
@@ -52,7 +52,7 @@ export default function Header() {
 
   return (
     <div
-      className="flex items-center justify-end border-b"
+      className="flex items-center justify-end border-b sticky top-0 z-50 bg-white"
     >
       <div>
         <nav>

@@ -28,7 +28,6 @@ function Login() {
     const response = await auth.signIn(requestPayload);
     if (response && !response.isError) {
       dispatch(setStatus({ signedIn: true }));
-      dispatch(setUser({ user: email }));
       navigate("/");
     } else {
       setError("Incorrect email or password");
@@ -52,7 +51,7 @@ function Login() {
             />
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleLogin)}>
-            <div className="-space-y-px rounded-md shadow-sm">
+            <div className="flex flex-col gap-2 rounded-md shadow-sm">
               <div>
                 <label htmlFor="email-address" className="sr-only">
                   Email address

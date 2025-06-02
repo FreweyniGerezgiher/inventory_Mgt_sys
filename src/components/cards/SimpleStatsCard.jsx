@@ -5,7 +5,7 @@ const SimpleStatsCard = ({ title, value, children }) => {
   return (
     <Card
       bordered={false}
-      className=" wrap py-2 bg-gray-400 justify-center align-middle items-center"
+      className="wrap py-2 bg-[#f2f2f2] justify-center align-middle items-center"
     >
       <div className="flex flex-row gap-3 items-center">
         {children}

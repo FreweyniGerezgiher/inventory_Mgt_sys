@@ -6,7 +6,6 @@ import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -150,13 +149,13 @@ const EditPurchaseForm = ({ purchaseData, submitBtnRef, onSuccess }) => {
       title: 'Unit Price',
       dataIndex: 'unit_price',
       key: 'unit_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Total',
       dataIndex: 'total_price',
       key: 'total_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Action',
@@ -297,7 +296,7 @@ const EditPurchaseForm = ({ purchaseData, submitBtnRef, onSuccess }) => {
                   rowKey={(record, index) => index}
                 />
                 <div className="mt-4 text-right font-bold">
-                  Total: ${items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
+                  Total: ETB {items.reduce((sum, item) => sum + parseFloat(item.total_price), 0).toFixed(2)}
                 </div>
               </>
             )}

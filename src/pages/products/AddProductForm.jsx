@@ -10,14 +10,12 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AddProductForm = ({ submitBtnRef, onSuccess }) => {
   const [loading, setLoading] = useState(false);
-
-    const [categories, setCategories] = useState([]);
-    const [category, setCategory] = useState({ id: "", name: "" });
-
+  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState({ id: "", name: "" });
 
   const getCategories = async () => {
     const response = await http.request({
-      url: `${URL + "/product_category/all"}`,
+      url: `${URL}/product_category/all`,
     });
 
     if (!response.isError) {
@@ -40,21 +38,25 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
         data: {
           name: data.name,
           category_id: parseInt(category.id),
-          sku: data.sku,
+          brand: data.brand,
+          model_number: data.model_number,
           selling_price: parseFloat(data.selling_price),
+          reorder_point: data.reorder_point ? parseInt(data.reorder_point) : null,
+          description: data.description || null,
+          minimum_stock_level: data.minimum_stock_level ? parseInt(data.minimum_stock_level) : null,
+          maximum_stock_level: data.maximum_stock_level ? parseInt(data.maximum_stock_level) : null,
         },
       };
-      console.log(requestPayload.data);
 
       const response = await http.request(requestPayload);
       if (!response.isError) {
         toast.success("Product added successfully");
         onSuccess();
       } else {
-        toast.error("Error adding product");
+        toast.error(response.error?.message || "Error adding product");
       }
     } catch (error) {
-      toast.error("Submission failed");
+      toast.error(error.message || "Submission failed");
     }
     setLoading(false);
   };
@@ -67,6 +69,7 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
     <div className="">
       <Space direction="vertical" className="w-full">
         <div className="w-full grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-2">
+
           <div className="flex flex-col mb-3 sm:mb-1">
             <Label required={true} className="mt-4" name="Name" />
             <BaseInput
@@ -80,33 +83,39 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
           </div>
 
           <div className="flex flex-col mb-3 sm:mb-1">
-          <Label required={true} className="mt-2" name="Category" />
-          <span className="flex flex-col w-full">
-            <select
-              className="w-full outline-none focus-within:border-2 pl-3 border text-sm border-gray-300 bg-white rounded py-2 pr-5"
-              value={category.id}
-              onChange={(e) => setCategory({ id: e.target.value })}
-            >
-              <option value="">Select category</option>
-              {categories.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </span>
-        </div>
+            <Label required={true} className="mt-2" name="Category" />
+            <span className="flex flex-col w-full">
+              <select
+                className="w-full outline-none focus-within:border-2 pl-3 border text-sm border-gray-300 bg-white rounded py-2 pr-5"
+                value={category.id}
+                onChange={(e) => setCategory({ id: e.target.value })}
+              >
+                <option value="">Select category</option>
+                {categories.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </span>
+          </div>
 
           <div className="flex flex-col mb-3 sm:mb-1">
-            <Label required={true} className="mt-4" name="SKU" />
+            <Label className="mt-4" name="Brand" />
             <BaseInput
-              placeholder="Stock Keeping Unit"
+              placeholder="brand"
               className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
-              {...register("sku", { required: true })}
+              {...register("brand")}
             />
-            {errors.sku && (
-              <span className="text-red-400 mt-2 text-xs">SKU is required</span>
-            )}
+          </div>
+          
+          <div className="flex flex-col mb-3 sm:mb-1">
+            <Label required={true} className="mt-4" name="Model Number" />
+            <BaseInput
+              placeholder="Model Number"
+              className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
+              {...register("model_number")}
+            />
           </div>
 
           <div className="flex flex-col mb-3 sm:mb-1">
@@ -116,10 +125,39 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
               step="0.01"
               placeholder="Selling Price"
               className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
-              {...register("selling_price", { required: true })}
+              {...register("selling_price", { 
+                required: true,
+                min: 0.01
+              })}
             />
             {errors.selling_price && (
-              <span className="text-red-400 mt-2 text-xs">Selling price is required</span>
+              <span className="text-red-400 mt-2 text-xs">
+                {errors.selling_price.type === 'required' 
+                  ? 'Selling price is required' 
+                  : 'Price must be greater than 0'}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col mb-3 sm:mb-1">
+            <Label className="mt-4" name="Description" />
+            <BaseInput
+              placeholder="Product description"
+              className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
+              {...register("description")}
+            />
+          </div>
+
+          <div className="flex flex-col mb-3 sm:mb-1">
+            <Label className="mt-4" name="Reorder Point" />
+            <BaseInput
+              type="number"
+              placeholder="Reorder point quantity"
+              className="outline-none focus-within:border-2 pl-3 border border-gray-700 rounded py-2 w-full text-sm"
+              {...register("reorder_point", { min: 0 })}
+            />
+            {errors.reorder_point && (
+              <span className="text-red-400 mt-2 text-xs">Must be a positive number</span>
             )}
           </div>
         </div>
@@ -131,8 +169,9 @@ const AddProductForm = ({ submitBtnRef, onSuccess }) => {
           ref={submitBtnRef}
           className="bg-blue-600 rounded-md px-5 h-10 font-medium text-md ml-4 py-0.5"
           onClick={handleSubmit(handleRegistration)}
+          disabled={loading}
         >
-          Register
+          {loading ? 'Adding...' : 'Add Product'}
         </button>
       </div>
     </div>

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
-import { Dropdown, Space, ConfigProvider, Table, Tag, Typography } from "antd";
+import { Dropdown, Space, ConfigProvider, Table, Input, Typography } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormDrawer from "../../components/drawer/FormDrawer";
 import EditSalesForm from "./EditSalesForm";
@@ -10,6 +10,7 @@ import AddSalesForm from "./AddSalesForm";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 
 const { Text } = Typography;
 
@@ -20,7 +21,7 @@ export default function SalesTable() {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [searchTerm, setSearchTerm] = useState(""); 
   const submitBtnRef = useRef(null);
   const confirmBtnRef = useRef(null);
 
@@ -38,10 +39,15 @@ export default function SalesTable() {
       key: "customer_name",
     },
     {
+      title: "Ref Number",
+      dataIndex: "reference_number",
+      key: "reference_number",
+    },
+    {
       title: "Total Amount",
       dataIndex: "total_amount",
       key: "total_amount",
-      render: (amount) => `₦${parseFloat(amount).toFixed(2)}`,
+      render: (amount) => `ETB ${parseFloat(amount).toFixed(2)}`,
       sorter: (a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount),
     },
     {
@@ -114,9 +120,9 @@ export default function SalesTable() {
         key: "product_name",
       },
       {
-        title: "SKU",
-        dataIndex: ["product", "sku"],
-        key: "sku",
+        title: "Brand",
+        dataIndex: ["product", "brand"],
+        key: "brand",
       },
       {
         title: "Quantity",
@@ -127,13 +133,13 @@ export default function SalesTable() {
         title: "Unit Price",
         dataIndex: "unit_price",
         key: "unit_price",
-        render: (price) => `₦${parseFloat(price).toFixed(2)}`,
+        render: (price) => `ETB ${parseFloat(price).toFixed(2)}`,
       },
       {
         title: "Total",
         dataIndex: "total_price",
         key: "total_price",
-        render: (price) => `₦${parseFloat(price).toFixed(2)}`,
+        render: (price) => `ETB ${parseFloat(price).toFixed(2)}`,
       },
     ];
 
@@ -141,7 +147,7 @@ export default function SalesTable() {
       <Table
         columns={itemColumns}
         dataSource={record.items}
-        pagination={false}
+        pagination={{ pageSize: 10 }}
         rowKey="id"
         size="small"
       />
@@ -149,12 +155,15 @@ export default function SalesTable() {
   };
 
   // Fetch sales data
-  const fetchSales = async () => {
+  const fetchSales = async (keyword = "") => {
     try {
       setLoading(true);
       const response = await http.request({
         method: "get",
         url: `${URL}/sales/all`,
+        params: {
+          search: keyword
+        }
       });
 
       if (!response.isError) {
@@ -179,6 +188,19 @@ export default function SalesTable() {
       setSelectedSale(record);
       setIsDelete(true);
     }
+  };
+
+
+   // Debounced search function
+  const debouncedSearch = debounce((value) => {
+    fetchSales(value);
+  }, 500);
+
+  // Handle search input change
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
   };
 
   // Handle form close
@@ -232,6 +254,18 @@ export default function SalesTable() {
       <div className="flex flex-col">
         <div className="overflow-x-auto sm:-mx">
           <div className="inline-block min-w-full px-1.5 py-2 align-middle mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">Sales</h1>
+            <div className="mb-4 w-1/2">
+              <Input
+                placeholder="Search by reference number, customer ..."
+                prefix={<MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />}
+                onChange={handleSearch}
+                value={searchTerm}
+                allowClear
+              />
+            </div>
+            </div>
             <div className="overflow-hidden md:rounded-lg">
               <Table
                 columns={columns}

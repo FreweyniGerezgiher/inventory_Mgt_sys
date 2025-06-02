@@ -16,6 +16,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState(0);
+  const [reference_number, setReferenceNumber] = useState(0);
 
 
   const {
@@ -57,7 +58,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
       product_id: selectedProduct.id,
       product_name: selectedProduct.name,
       quantity: parseInt(quantity),
-      unit_price: parseFloat(unitPrice),
+      unit_price: parseFloat(selectedProduct.selling_price),
       total_price: (parseFloat(unitPrice) * parseInt(quantity)).toFixed(2)
     };
     
@@ -73,6 +74,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
   };
 
   const handleRegistration = async (data) => {
+    console.log(data)
     if (items.length === 0) {
       toast.error("Please add at least one item");
       return;
@@ -86,7 +88,8 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
         data: {
           customer_name: data.customer_name,
           total_amount: items.reduce((sum, item) => sum + parseFloat(item.total_price), 0),
-          location_id: parseInt(data.location_id),
+          location_id: parseInt(location.id),
+          reference_number: reference_number,
           items: items.map(item => ({
             product_id: item.product_id,
             quantity: item.quantity,
@@ -126,13 +129,13 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
       title: 'Unit Price',
       dataIndex: 'unit_price',
       key: 'unit_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Total',
       dataIndex: 'total_price',
       key: 'total_price',
-      render: (price) => `$${parseFloat(price).toFixed(2)}`
+      render: (price) => `ETB ${parseFloat(price).toFixed(2)}`
     },
     {
       title: 'Action',
@@ -142,6 +145,12 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
       ),
     },
   ];
+
+  useEffect(() => {
+  if (selectedProduct) {
+    setUnitPrice(selectedProduct.selling_price);
+  }
+}, [selectedProduct]);
 
   useEffect(() => {
     getLocations();
@@ -181,7 +190,15 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
             </select>
           </span>
         </div>
-          </div>
+        <div className="w-full">
+          <Label name="Reference Number" />
+          <Input
+            type="text"
+            value={reference_number}
+            onChange={(e) => setReferenceNumber(e.target.value)}
+          />
+        </div>
+      </div>
 
           <div className="mt-4">
             <h3 className="font-medium mb-2">Add Items</h3>
@@ -199,7 +216,9 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
                       placeholder="Search product"
                       optionFilterProp="children"
                       onChange={(value, option) => {
-                        setSelectedProduct(option.product);
+                        const selectedProduct = option.product;
+                        setSelectedProduct(selectedProduct);
+                        setUnitPrice(selectedProduct.selling_price); // Set unit price here
                         field.onChange(value);
                       }}
                     >
@@ -229,6 +248,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
                   min={0}
                   step="0.01"
                   value={unitPrice}
+                  readOnly
                   onChange={(e) => setUnitPrice(e.target.value)}
                 />
               </div>

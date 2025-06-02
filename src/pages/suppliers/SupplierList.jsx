@@ -2,27 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
-import { Dropdown, Space, ConfigProvider,Table} from "antd";
+import { Dropdown, Space, ConfigProvider } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import FormDrawer from "../../components/drawer/FormDrawer";
+import DataTable from "../../components/tables/DataTable";
+import FormModal from "../../components/modals/FormModal";
 import AddSupplierForm from "./AddSupplierForm";
 import UpdateSupplierForm from "./EditSupplierForm";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
+import FormDrawer from "../../components/drawer/FormDrawer";
 
 const SupplierTable = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [openEdit, setOpenEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState({});
+  const [loading, setLoading] = useState(false);
   const submitBtnRef = useRef(null);
   const confirmBtnRef = useRef(null);
 
   const columns = [
     {
-      title: "No.",
+      title: "ID",
       dataIndex: "id",
       key: "id",
       sorter: (a, b) => a.id - b.id,
@@ -32,8 +34,6 @@ const SupplierTable = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-       sorter: (a, b) => a.id - b.id,
-      defaultSortOrder: "ascend",
     },
     {
       title: "Company",
@@ -61,7 +61,7 @@ const SupplierTable = () => {
       key: "account_number",
     },
     {
-      title:"Bank Name",
+      title: "Bank Name",
       dataIndex: "bank_name",
       key: "bank_name",
     },
@@ -136,7 +136,7 @@ const SupplierTable = () => {
     setSelectedSupplier(record);
     switch (event.key) {
       case "1":
-        setOpenUpdate(true);
+        setOpenEdit(true);
         break;
       case "2":
         setIsDelete(true);
@@ -147,8 +147,7 @@ const SupplierTable = () => {
 
   const handleOnClose = () => {
     setOpen(false);
-    setOpenUpdate(false);
-    setOpenDetails(false);
+    setOpenEdit(false);
     setSelectedSupplier(null);
     fetchSuppliers();
   };
@@ -190,24 +189,28 @@ const SupplierTable = () => {
     if (isDelete && selectedSupplier?.id) handleDeleteSupplier();
   }, [isDelete, selectedSupplier?.id]);
 
+  const tableProps = {
+    bordered: true,
+    size: "middle",
+  };
+
   return (
     <div className="mx-auto">
       <div className="flex flex-col">
-        <div className="overflow-x-auto sm:-mx">
+        <div className="overflow-x-auto">
           <div className="inline-block min-w-full px-1.5 py-2 align-middle">
-            <div className="overflow-hidden md:rounded-lg">
-              <Table
-                columns={columns}
-                dataSource={suppliers}
+            <div className="overflow-y-visible z-10 md:rounded-lg">
+              <DataTable
+                data={suppliers}
                 loading={loading}
-                rowKey="id"
-                scroll={{ x: true }}
+                columns={columns}
+                tableProps={tableProps}
               />
             </div>
           </div>
 
           <div
-            className="group fixed bottom-1 z-50 md:bottom-10 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
+            className="fixed bottom-1 md:bottom-10 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
             onClick={handleAddClick}
           >
             <div className="absolute z-50 flex items-center justify-center rounded-full bg-blue-600 p-3 shadow-xl">
@@ -228,11 +231,11 @@ const SupplierTable = () => {
         </FormDrawer>
       )}
 
-      {openUpdate && (
+       {openEdit && (
         <FormDrawer
           title={`Edit Supplier #${selectedSupplier.id}`}
           onSubmitForm={handleSubmitSupplier}
-          open={openUpdate}
+          open={openEdit}
           onCloseDrawer={handleOnClose}
           isUpdate={true}
         >
@@ -243,6 +246,7 @@ const SupplierTable = () => {
           />
         </FormDrawer>
       )}
+
       <ConfirmModal
         onDeleteItem={handleDeleteItem}
         title="Delete Supplier"

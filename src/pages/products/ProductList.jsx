@@ -6,6 +6,7 @@ import { Dropdown, Space, ConfigProvider} from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormDrawer from "../../components/drawer/FormDrawer";
 import AddProductForm from "./AddProductForm";
+import EditProductForm from "./EditProductForm";
 import DataTable from "../../components/tables/DataTable";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
@@ -41,15 +42,20 @@ export default function ProductTable() {
     key: "category_name",
   },
   {
-    title: "SKU",
-    dataIndex: "sku",
-    key: "sku",
+    title: "Brand",
+    dataIndex: "brand",
+    key: "brand",
+  },
+  {
+    title: "Model Number",
+    dataIndex: "model_number",
+    key: "model_number",
   },
   {
     title: "Selling Price",
     dataIndex: "selling_price",
     key: "selling_price",
-    render: (price) => `$${parseFloat(price).toFixed(2)}`,
+    render: (price) => `ETB ${parseFloat(price).toFixed(2)}`,
     sorter: (a, b) => a.selling_price - b.selling_price,
   },
   {
@@ -235,6 +241,22 @@ export default function ProductTable() {
         <AddProductForm onSuccess={handleOnClose} submitBtnRef={submitBtnRef} />
         </FormDrawer>
       )}
+
+      {selectedProduct && openUpdate && (
+          <FormDrawer
+            title="Edit Product"
+            onSubmitForm={handleSubmitProductEvent}
+            open={openUpdate}
+            onCloseDrawer={handleOnClose}
+            isUpdate={true}
+          >
+            <EditProductForm 
+              item={selectedProduct} 
+              onSuccess={handleOnClose} 
+              submitBtnRef={submitBtnRef} 
+            />
+          </FormDrawer>
+        )}
 
       <ConfirmModal
         onDeleteItem={handleDeleteItem}

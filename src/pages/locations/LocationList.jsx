@@ -7,20 +7,14 @@ import { DownOutlined } from "@ant-design/icons";
 import DataTable from "../../components/tables/DataTable";
 import FormModal from "../../components/modals/FormModal";
 import AddLocation from "./AddLocation";
+import EditLocationForm from "./EditLocation";
 import ConfirmModal from "../../components/modals/ConfirmModal";
-import DetailsDrawer from "../../components/drawer/DetailsDrawer";
 import { toast } from "react-toastify";
 
-const items = [
-  { key: "1", label: <span style={{ color: "#00FFFF" }}>Edit</span> },
-  { key: "2", label: <span style={{ color: "#00FFFF" }}>Details</span> },
-  { key: "3", label: <span style={{ color: "#00FFFF" }}>Delete</span> },
-];
 
 export default function LocationTable() {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openDetails, setOpenDetails] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState({});
   const submitBtnRef = useRef(null);
@@ -69,12 +63,21 @@ export default function LocationTable() {
           }}
         >
           <Dropdown
-            menu={{
-              items,
-              onClick: (event) => handleMenuClick(event, record),
-            }}
-            className="flex flex-row px-4"
-          >
+          menu={{
+            items: [
+              {
+                key: "1",
+                label: <span style={{ color: "#00FFFF" }}>Edit</span>,
+              },
+              {
+                key: "2",
+                label: <span style={{ color: "#00FFFF" }}>Delete</span>,
+              }
+              
+            ],
+            onClick: (event) => handleMenuClick(event, record),
+          }}
+        >
             <a>
               <Space size="small">
                 Actions
@@ -135,10 +138,6 @@ export default function LocationTable() {
     }
     if (event.key === "2") {
       setSelectedLocation(recordItem);
-      setOpenDetails(true);
-    }
-    if (event.key === "3") {
-      setSelectedLocation(recordItem);
       setIsDelete(true);
     }
   };
@@ -148,7 +147,6 @@ export default function LocationTable() {
   const handleOnClose = () => {
     setOpen(false);
     setOpenEdit(false);
-    setOpenDetails(false);
     setSelectedLocation(null);
     fetchLocations();
   };
@@ -176,7 +174,7 @@ export default function LocationTable() {
         <div className="flex flex-col">
           <div className="overflow-x-auto">
             <div className="inline-block min-w-full px-1.5 py-2 align-middle">
-              <div className="overflow-hidden md:rounded-lg">
+              <div className="overflow-y-visiblevisible z-10 md:rounded-lg">
                 <DataTable
                   data={locations}
                   loading={loading}
@@ -205,6 +203,21 @@ export default function LocationTable() {
       >
         <AddLocation onSuccess={handleOnClose} submitBtnRef={submitBtnRef} />
       </FormModal>
+
+       {selectedLocation && openEdit && (
+      <FormModal
+        isModalOpen={openEdit}
+        onCloseModal={handleOnClose}
+        title="Edit Location"
+        onSubmitForm={handleSubmitLocationEvent}
+      >
+        <EditLocationForm
+          location={selectedLocation}
+          onSuccess={handleOnClose}
+          submitBtnRef={submitBtnRef}
+        />
+      </FormModal>
+    )}
 
       <ConfirmModal
         onDeleteItem={handleDeleteItem}
