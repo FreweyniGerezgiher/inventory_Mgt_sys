@@ -5,6 +5,7 @@ import LocationTable from "./locations/LocationList";
 import CategoryTable from "./product-categories/CategoryList"
 import PurchaseTable from "./purchases/PurchaseList"
 import SupplierTable from "./suppliers/SupplierList";
+import TransferTable from "./transfers/TransferList";
 import SalesTable from "./sales/SalesList"
 import { Tab } from "@headlessui/react";
 import Header from "../components/layouts/HeaderNav"
@@ -82,7 +83,23 @@ export default function ListDashBoard() {
                   <TruckIcon className="w-5 h-5 font-bold" />
                   <p className="text-xs md:text-base">Purchases</p>
                 </div>
-              </Tab>                
+              </Tab>            
+
+              <Tab
+                className={({ selected }) =>
+                  classNames(
+                    "w-full px-2 py-2 font-semibold border-white text-base text-start focus:outline-none",
+                    selected
+                      ? "bg-slate-700 md:border-l-2 border-b-2 md:border-b-0"
+                      : "border-l-0"
+                  )
+                }
+              >
+                <div className="flex gap-3">
+                  <ShoppingCartIcon className="w-5 h-5 font-bold" />
+                  <p className="text-xs md:text-base">Transfers</p>
+                </div>
+              </Tab>    
               
               <hr className="border-gray-700 mx-2" />
 
@@ -159,6 +176,8 @@ export default function ListDashBoard() {
               </Tab>
               
               {/* Product Categories */}
+              {user.role === "Admin" && (
+                
               <Tab
                 className={({ selected }) =>
                   classNames(
@@ -174,6 +193,8 @@ export default function ListDashBoard() {
                   <p className="text-xs md:text-base">Product Categories</p>
                 </div>
               </Tab>
+              )}
+
             </Tab.List>
             <div className="flex-1 flex flex-col min-h-screen">
               <Header className="sticky top-0 z-10" />
@@ -187,10 +208,14 @@ export default function ListDashBoard() {
                 <Tab.Panel className="h-full">
                   <PurchaseTable />
                 </Tab.Panel>
+                <Tab.Panel className="h-full">
+                  <TransferTable />
+                </Tab.Panel>
                 
                 {user.role === "Admin" && (<Tab.Panel className="h-full">
                   <UserTable />
                 </Tab.Panel>)}
+                
                 <Tab.Panel className="h-full">
                   <SupplierTable />
                 </Tab.Panel>
@@ -200,9 +225,13 @@ export default function ListDashBoard() {
                 <Tab.Panel className="h-full">
                   <ProductTable />
                 </Tab.Panel>
+                  {user.role === "Admin" && (
                 <Tab.Panel className="h-full">
                   <CategoryTable />
                 </Tab.Panel>
+                  )}
+                  
+
               </Tab.Panels>
             </div>
           </div>

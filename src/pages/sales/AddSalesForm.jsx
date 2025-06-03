@@ -1,23 +1,24 @@
 import { Space, Button, Table, Input, Select } from "antd";
 import Label from "../../components/controlled/Label";
 import BaseInput from "../../components/controlled/BaseInput";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, set } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { userService } from "../../services/storageService";
 
 const { Option } = Select;
 
 const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
+  const user = userService.getUser();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState(0);
-  const [reference_number, setReferenceNumber] = useState(0);
-
+  const [reference_number, setReferenceNumber] = useState('');
 
   const {
     register,
@@ -51,6 +52,19 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
     }
   };
 
+  const handleQuantityChange = (value) => {
+    const newQuantity = parseInt(value);
+    if (isNaN(newQuantity)) return;
+
+    // Check stock level if product is selected
+    if (selectedProduct && newQuantity > selectedProduct.current_stock) {
+      toast.error(`Quantity exceeds available stock (${selectedProduct.current_stock})`);
+      return;
+    }
+
+    setQuantity(newQuantity);
+  };
+
   const handleAddItem = () => {
     if (!selectedProduct || !quantity) return;
     
@@ -74,7 +88,6 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
   };
 
   const handleRegistration = async (data) => {
-    console.log(data)
     if (items.length === 0) {
       toast.error("Please add at least one item");
       return;
@@ -105,10 +118,10 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
         reset();
         onSuccess();
       } else {
-        toast.error("Error recording sale");
+        toast.error(response);
       }
     } catch (error) {
-      toast.error("Submission failed");
+      toast.error(error.message);
       console.error(error);
     }
     setLoading(false);
@@ -156,6 +169,9 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
     getLocations();
     getProducts();
   }, []);
+  useEffect(() => {
+    if (locations.length > 0) setLocation(()=>locations.find(location => location?.id === user.location_id));
+  }, [locations])
   return (
     <div className="">
       <form onSubmit={handleSubmit(handleRegistration)}>
@@ -218,7 +234,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
                       onChange={(value, option) => {
                         const selectedProduct = option.product;
                         setSelectedProduct(selectedProduct);
-                        setUnitPrice(selectedProduct.selling_price); // Set unit price here
+                        setUnitPrice(selectedProduct.selling_price);
                         field.onChange(value);
                       }}
                     >
@@ -238,7 +254,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
                   type="number"
                   min={1}
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={(e) => handleQuantityChange(e.target.value)}
                 />
               </div>
               <div className="w-32">

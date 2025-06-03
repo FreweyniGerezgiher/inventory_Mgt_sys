@@ -6,10 +6,12 @@ import { URL } from "../../config/config";
 import { http } from "../../services/http/http";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { userService } from "../../services/storageService";
 
 const { Option } = Select;
 
 const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
+  const user = userService.getUser();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,6 +30,7 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
   const [locations, setLocations] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [location, setLocation] = useState({ id: "", name: "" });
 
   const fetchLocations = async () => {
     const response = await http.request({
@@ -93,7 +96,7 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
         data: {
           supplier_id: data.supplier_id ? parseInt(data.supplier_id) : null,
           total_amount: items.reduce((sum, item) => sum + parseFloat(item.total_price), 0),
-          location_id: parseInt(data.location_id),
+          location_id: parseInt(location.id),
           reference_number: reference_number,
           items: items.map(item => ({
             product_id: item.product_id,
@@ -157,6 +160,10 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
     fetchProducts();
   }, []);
 
+    useEffect(() => {
+    if (locations.length > 0) setLocation(()=>locations.find(location => location?.id === user.location_id));
+  }, [locations])
+
   return (
     <div className="">
       <form onSubmit={handleSubmit(handleRegistration)}>
@@ -187,29 +194,22 @@ const AddPurchaseForm = ({ submitBtnRef, onSuccess }) => {
             </div>
 
             <div className="flex flex-col mb-3 sm:mb-1">
-              <Label required={true} className="mt-4" name="Location" />
-              <Controller
-                name="location_id"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    style={{ width: '100%' }}
-                    placeholder="Select location"
-                  >
-                    {locations.map(location => (
-                      <Option key={location.id} value={location.id}>
-                        {location.name}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              />
-              {errors.location_id && (
-                <span className="text-red-400 mt-2 text-xs">Location is required</span>
-              )}
-            </div>
+          <Label required={true} className="mt-2" name="Location" />
+          <span className="flex flex-col w-full">
+            <select
+              className="w-full outline-none focus-within:border-2 pl-3 border text-sm border-gray-300 bg-white rounded py-2 pr-5"
+              value={location.id}
+              onChange={(e) => setLocation({ id: e.target.value })}
+            >
+              <option value="">Select location</option>
+              {locations.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </span>
+        </div>
 
             <div className="w-full">
               <Label name="Reference Number" />

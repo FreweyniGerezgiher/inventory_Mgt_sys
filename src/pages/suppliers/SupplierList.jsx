@@ -5,14 +5,16 @@ import { http } from "../../services/http/http";
 import { Dropdown, Space, ConfigProvider } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import DataTable from "../../components/tables/DataTable";
-import FormModal from "../../components/modals/FormModal";
 import AddSupplierForm from "./AddSupplierForm";
 import UpdateSupplierForm from "./EditSupplierForm";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
 import FormDrawer from "../../components/drawer/FormDrawer";
+import { userService } from "../../services/storageService";
 
 const SupplierTable = () => {
+  let user = userService.getUser();
+
   const [suppliers, setSuppliers] = useState([]);
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -65,7 +67,8 @@ const SupplierTable = () => {
       dataIndex: "bank_name",
       key: "bank_name",
     },
-    {
+    
+    ...(user.role === "Admin" ? [{
       title: "Action",
       key: "action",
       fixed: "right",
@@ -96,16 +99,17 @@ const SupplierTable = () => {
               onClick: (event) => handleMenuClick(event, record),
             }}
           >
-            <a>
-              <Space size="small">
-                Actions
-                <DownOutlined style={{ fontSize: "90%" }} />
-              </Space>
-            </a>
+              <a>
+                <Space size="small">
+                  Actions
+                  <DownOutlined style={{ fontSize: "90%" }} />
+                </Space>
+              </a>
           </Dropdown>
         </ConfigProvider>
       ),
-    },
+    }]: []),
+
   ];
 
   const fetchSuppliers = async () => {
@@ -208,7 +212,7 @@ const SupplierTable = () => {
               />
             </div>
           </div>
-
+    {user.role === "Admin" && (
           <div
             className="fixed bottom-1 md:bottom-10 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
             onClick={handleAddClick}
@@ -217,6 +221,8 @@ const SupplierTable = () => {
               <PlusIcon className="h-full w-full text-white" />
             </div>
           </div>
+          )}
+
         </div>
       </div>
 

@@ -40,12 +40,12 @@ function Login() {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 h-screen  items-center place-items-center">
         <div className="flex justify-center">
-          <img src="src/assets/signup.jpg" alt="" />
+          <img src="src/assets/login.jpeg" alt="" />
         </div>
         <div className="w-full max-w-md space-y-8 p-10 rounded-lg">
           <div>
             <img
-              className="mx-auto h-12 w-auto"
+              className="mx-auto h-34 w-auto"
               src="src/assets/logo.png"
               alt="Your Company"
             />

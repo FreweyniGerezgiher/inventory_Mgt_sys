@@ -10,9 +10,12 @@ import AddLocation from "./AddLocation";
 import EditLocationForm from "./EditLocation";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
+import { userService } from "../../services/storageService";
 
 
 export default function LocationTable() {
+  let user = userService.getUser();
+
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
@@ -46,7 +49,8 @@ export default function LocationTable() {
       key: "is_primary",
       render: (val) => (val ? "Yes" : "No"),
     },
-    {
+
+    ...(user.role === "Admin" ? [{
       title: "Action",
       key: "action",
       fixed: "right",
@@ -87,7 +91,7 @@ export default function LocationTable() {
           </Dropdown>
         </ConfigProvider>
       ),
-    },
+    }] : []),
   ];
 
   const fetchLocations = async () => {
@@ -183,6 +187,7 @@ export default function LocationTable() {
                 />
               </div>
             </div>
+        {user.role==="Admin" &&(
             <div
               className="fixed bottom-1 md:bottom-10 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
               onClick={handleAddClick}
@@ -191,6 +196,8 @@ export default function LocationTable() {
                 <PlusIcon className="h-full w-full" />
               </div>
             </div>
+        )}
+
           </div>
         </div>
       </div>

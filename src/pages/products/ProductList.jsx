@@ -10,7 +10,10 @@ import EditProductForm from "./EditProductForm";
 import DataTable from "../../components/tables/DataTable";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
+import { userService } from "../../services/storageService";
+
 export default function ProductTable() {
+  const user = userService.getUser()
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
@@ -59,14 +62,9 @@ export default function ProductTable() {
     sorter: (a, b) => a.selling_price - b.selling_price,
   },
   {
-    title: "Status",
-    dataIndex: "is_active",
-    key: "is_active",
-    render: (isActive) => (
-      <span style={{ color: isActive ? "#00FF00" : "#d42f06" }}>
-        {isActive ? "Active" : "Inactive"}
-      </span>
-    ),
+    title:"Stock",
+    dataIndex: 'quantity_in_stock',
+    key:"quantity_in_stock"
   },
   {
     title: "Action",
@@ -122,7 +120,7 @@ export default function ProductTable() {
       };
       const response = await http.request(requestPayload);
       if (!response.isError) {
-        setProducts(response.data.map((product) => ({ ...product, key: product.id, category_name: product.category.name })));
+        setProducts(response.data.map((product) => ({ ...product, key: product.id, quantity_in_stock: product.stocks?.[0]?.quantity_in_stock || product.current_stock || 0, category_name: product.category.name })));
       }
       setLoading(false);
     } catch (error) {
@@ -206,7 +204,7 @@ export default function ProductTable() {
                 />
               </div>
             </div>
-
+          {user?.role === "Admin" && (
             <div
               className="group fixed   bottom-1 z-50 md:bottom-5 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
               onClick={handleAddClick}
@@ -215,6 +213,8 @@ export default function ProductTable() {
                 <PlusIcon className="h-full w-full" />
               </div>
             </div>
+          )}
+
           </div>
         </div>
       </div>
