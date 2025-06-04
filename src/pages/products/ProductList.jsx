@@ -66,7 +66,8 @@ export default function ProductTable() {
     dataIndex: 'quantity_in_stock',
     key:"quantity_in_stock"
   },
-  {
+
+  ...(user.role === "Admin" ? [{
     title: "Action",
     key: "action",
     fixed: "right",
@@ -107,9 +108,8 @@ export default function ProductTable() {
         </Dropdown>
       </ConfigProvider>
     ),
-  },
+  }] : []),
 ];
-
 
   const fetchProducts = async () => {
     try {

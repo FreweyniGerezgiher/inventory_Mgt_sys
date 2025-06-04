@@ -76,7 +76,8 @@ export default function PurchaseTable() {
         <Text strong>{record.items?.length || 0} items</Text>
       ),
     },
-    {
+
+    ...(user.role === "Admin" ? [{
       title: "Action",
       key: "action",
       fixed: "right",
@@ -116,7 +117,7 @@ export default function PurchaseTable() {
           </Dropdown>
         </ConfigProvider>
       ),
-    },
+    }] : []),
   ];
 
   // Expanded row columns for items

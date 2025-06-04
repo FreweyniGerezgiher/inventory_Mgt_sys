@@ -56,6 +56,18 @@ const AddTransferForm = ({ submitBtnRef, onSuccess }) => {
     setItems(updated);
   };
 
+    const handleQuantityChange = (value) => {
+    const newQuantity = parseInt(value);
+    if (isNaN(newQuantity)) return;
+
+    // Check stock level if product is selected
+    if (selectedProduct && newQuantity > selectedProduct.current_stock) {
+      toast.error(`Quantity exceeds available stock (${selectedProduct.current_stock})`);
+      return;
+    }
+
+    setQuantity(newQuantity);
+  };
   const handleTransfer = async () => {
     if (items.length === 0) return toast.error("Add items to transfer");
 
@@ -164,7 +176,7 @@ const AddTransferForm = ({ submitBtnRef, onSuccess }) => {
                   type="number"
                   min={1}
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={(e) => handleQuantityChange(e.target.value)}
                 />
               </div>
               <div className="self-end">

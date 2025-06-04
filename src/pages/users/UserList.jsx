@@ -8,21 +8,16 @@ import FormDrawer from "../../components/drawer/FormDrawer";
 import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import DataTable from "../../components/tables/DataTable";
-import ConfirmModal from "../../components/modals/ConfirmModal";
 import { toast } from "react-toastify";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
   const submitBtnRef = useRef(null);
-  const confirmBtnRef = useRef(null);
-  const removeAssetBtnRef = useRef(null);
 
   const handleSubmitUserEvent = () => {
     submitBtnRef.current?.click();
@@ -131,19 +126,21 @@ const columns = [
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const requestPayload = {
+      const response = await http.request({
         method: "get",
-        url: `${URL + "/users/all"}`,
-      };
-      const response = await http.request(requestPayload);
+        url: `${URL}/users/all`,
+      });
       if (!response.isError) {
-        setLoading(false);
-        setUsers(response.data.map((user) => ({ ...user, key: user.id, role: user.role.name, location: user.location.name })));
-      } else {
-        setLoading(false);
-        console.log({ response });
+        setUsers(response.data.map(user => ({ 
+          ...user, 
+          key: user.id, 
+          role: user.role.name, 
+          location: user.location.name 
+        })));
       }
     } catch (error) {
+      toast.error("Failed to fetch users");
+    } finally {
       setLoading(false);
     }
   };
@@ -151,17 +148,67 @@ const columns = [
   const handleAddClick = () => {
     setOpen(true);
   };
-  const handleMenuClick = (event, recordItem) => {
-    if (event.key === "1") {
-      setSelectedUser(recordItem);
-      setOpenUpdate(true);
-    }
-    if (event.key === "2") {
-      setSelectedUser(recordItem);
-      setIsDelete(true);
-    }
 
+  const handleMenuClick = async (event, recordItem) => {
+    console.log(event.key)
+    setSelectedUser(recordItem);
+    
+    switch(event.key) {
+      case "1":
+        setOpenUpdate(true);
+        break;
+      case "2": 
+      handleDeleteUser();
+        break;
+      case "3": 
+        await toggleUserStatus(recordItem);
+        break;
+    }
   };
+
+  const toggleUserStatus = async (user) => {
+    try {
+      const newStatus = user.status === 1 ? 0 : 1;
+      const response = await http.request({
+        method: "put",
+        url: `${URL}/users/update_status/${user.id}/${newStatus}`,
+        data: { status: newStatus }
+      });
+      
+      if (!response.isError) {
+        toast.success(`User ${newStatus === 1 ? 'activated' : 'deactivated'} successfully`);
+        fetchUsers();
+      } else {
+        toast.error(response.message || "Failed to update user status");
+      }
+    } catch (error) {
+      toast.error("Error updating user status");
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      if (!selectedUser) return;
+      
+      const response = await http.request({
+        method: "delete",
+        url: `${URL}/users/${selectedUser.id}`,
+      });
+      
+      if (!response.isError) {
+        toast.success("User deleted successfully");
+        fetchUsers();
+      } else {
+        toast.error(response.message || "Failed to delete user");
+      }
+    } catch (error) {
+      toast.error("Error deleting user");
+    } finally {
+      setIsDelete(false);
+      setSelectedUser(null);
+    }
+  };
+
   const handleOnClose = () => {
     setOpen(false);
     setOpenUpdate(false);
@@ -169,44 +216,14 @@ const columns = [
     fetchUsers();
   };
 
-  const handleDeleteItem = async () => {
-    try {
-      if (selectedUser?.driver_id) {
-        const requestPayload = {
-          method: "delete",
-          url: `${URL}/driver/remove/${selectedUser?.driver_id}`,
-        };
-        const response = await http.request(requestPayload);
-        if (!response.isError) {
-          toast.success("User Deleted successfully");
-          fetchUsers();
-        } else {
-          toast.error("Failed to delete driver");
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch data. Please try again later.", error);
-    }
-  };
-  function handleDeleteUser() {
-    if (confirmBtnRef.current) confirmBtnRef.current.click();
-    setIsDelete(false);
-  }
-
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  useEffect(() => {
-    if (isDelete && selectedUser?.driver_id) handleDeleteUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDelete, selectedUser?.driver]);
 
   const tableProps = {
     bordered: true,
     size: "middle",
   };
-
 
   return (
     <>
@@ -234,6 +251,7 @@ const columns = [
           </div>
         </div>
       </div>
+
       {open && (
         <FormDrawer
           title="Add User"
@@ -249,27 +267,20 @@ const columns = [
       )}
 
       {openUpdate && (
-      <FormDrawer
-        title={`Edit User #${selectedUser.id}`}
-        onSubmitForm={handleSubmitUserEvent}
-        open={openUpdate}
-        onCloseDrawer={handleOnClose}
-        isUpdate={true}
-      >
-        <EditUserForm 
-          userData={selectedUser} 
-          onSuccess={handleOnClose} 
-          submitBtnRef={submitBtnRef} 
-        />
-      </FormDrawer>
-    )}
-
-      <ConfirmModal
-        onDeleteItem={handleDeleteItem}
-        title={"Delete User"}
-        message={"this driver"}
-        confirmBtnRef={confirmBtnRef}
-      />
+        <FormDrawer
+          title={`Edit User #${selectedUser?.id}`}
+          onSubmitForm={handleSubmitUserEvent}
+          open={openUpdate}
+          onCloseDrawer={handleOnClose}
+          isUpdate={true}
+        >
+          <EditUserForm 
+            userData={selectedUser} 
+            onSuccess={handleOnClose} 
+            submitBtnRef={submitBtnRef} 
+          />
+        </FormDrawer>
+      )}
     </>
   );
 };
