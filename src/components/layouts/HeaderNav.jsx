@@ -11,7 +11,7 @@ export default function Header() {
 
   const items = [
     {
-      label: <h3 className="text-md font-semibold">{user.first_name + " " + user.last_name}</h3>,
+      label: <h3 className="text-md font-semibold">{user.first_name + " " + user.last_name + "-" + user.role}</h3>,
       key: "1",
       icon: (
         <UserOutlined className="text-blue-400" style={{ fontSize: "110%" }} />

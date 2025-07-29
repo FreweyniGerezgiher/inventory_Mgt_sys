@@ -77,7 +77,7 @@ export default function PurchaseTable() {
       ),
     },
 
-    ...(user.role === "Admin" ? [{
+    ...((user.role ==="Admin" || user.role ==="Purchase Officer" || user.role ==="General Manager")? [{
       title: "Action",
       key: "action",
       fixed: "right",
@@ -295,7 +295,7 @@ export default function PurchaseTable() {
             </div>
           </div>
 
-          {user.role ==="Admin" || user.role ==="Purchase Officer" || user.role ==="General Manager" && (
+          {(user.role ==="Admin" || user.role ==="Purchase Officer" || user.role ==="General Manager") && (
           <div
             className="group fixed bottom-1 z-50 md:bottom-5 right-1 md:right-10 flex h-12 w-12 cursor-pointer items-end justify-end"
             onClick={() => setOpen(true)}

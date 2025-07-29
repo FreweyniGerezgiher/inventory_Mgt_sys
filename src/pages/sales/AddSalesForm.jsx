@@ -193,6 +193,7 @@ const AddSalesForm = ({ submitBtnRef, onSuccess }) => {
           <Label required={true} className="mt-2" name="Location" />
           <span className="flex flex-col w-full">
             <select
+              disabled={user.role!=="Admin"}
               className="w-full outline-none focus-within:border-2 pl-3 border text-sm border-gray-300 bg-white rounded py-2 pr-5"
               value={location.id}
               onChange={(e) => setLocation({ id: e.target.value })}
